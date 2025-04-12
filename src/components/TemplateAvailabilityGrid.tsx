@@ -28,10 +28,10 @@ export const TemplateAvailabilityGrid: React.FC<TemplateAvailabilityGridProps> =
         <div className="space-y-2">
             {daysOfWeek.map(({ name, value: dayOfWeek }) => (
                 <div key={dayOfWeek} className="flex items-center space-x-2">
-                    <span className="w-10 text-xs font-semibold text-slate-600 dark:text-slate-400 text-right">
+                    <span className="w-5 sm:w-10 text-xs font-semibold text-slate-600 dark:text-slate-400 text-right">
                         {name}
                     </span>
-                    <div className="flex-grow grid grid-cols-12 gap-1">
+                    <div className="flex-grow grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-1">
                         {Array.from({ length: 24 }).map((_, hour) => {
                             const isSelected = templateAvailability[dayOfWeek]?.includes(hour) || false;
                             return (
