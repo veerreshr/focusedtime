@@ -3,8 +3,7 @@
  * Allows users to indicate interest in potential features via mailto links.
  */
 import React from 'react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { FaEnvelope, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
+import { FaEnvelope } from 'react-icons/fa';
 
 // Define the structure for potential features
 interface PotentialFeature {

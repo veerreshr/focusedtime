@@ -6,8 +6,6 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { getDatesInRange } from '../utils/dateHelpers';
 import { TimelineDay } from './TimelineDay';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { LoadingSpinner } from './common/LoadingSpinner'; // Assuming a LoadingSpinner component exists
 
 export const Timeline: React.FC = () => {
     const { activeGoal } = useAppContext();

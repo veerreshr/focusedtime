@@ -4,10 +4,8 @@
  * Manages the global application state using Context API and reducers.
  */
 import React, { createContext, useReducer, useContext, useEffect, ReactNode, Dispatch } from 'react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AppState, AppAction, Goal, ReminderSettings, Availability } from '../types/index.ts';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { format, getDay, parseISO, isValid } from 'date-fns';
+import { AppState, AppAction, Goal, Availability } from '../types/index.ts';
+import { getDay, parseISO, isValid } from 'date-fns';
 import { getDatesInRange } from '../utils/dateHelpers';
 
 // --- Local Storage Keys ---

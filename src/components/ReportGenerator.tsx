@@ -5,10 +5,7 @@
  */
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Goal } from '../types';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { format as formatFn, startOfWeek, endOfWeek, subWeeks, eachDayOfInterval, parseISO } from 'date-fns';
+import { format as formatFn, startOfWeek, endOfWeek, subWeeks, eachDayOfInterval } from 'date-fns';
 import { unparse } from 'papaparse'; // Import from papaparse
 import { FaFileCsv, FaFileAlt, FaShareAlt, FaCalendarWeek, FaEye, FaTimes } from 'react-icons/fa';
 import { formatTime } from '../utils/dateHelpers';

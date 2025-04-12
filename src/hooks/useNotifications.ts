@@ -4,8 +4,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { calculateReminderTime, formatDate, formatTime, isPast } from '../utils/dateHelpers';
+import { calculateReminderTime, formatTime, isPast } from '../utils/dateHelpers';
 
 interface ScheduledNotification {
     id: string; // Unique ID (e.g., goalId-date-hour)
