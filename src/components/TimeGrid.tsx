@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { formatReadableDate, formatTime } from '../utils/dateHelpers';
+import { isToday, parseISO } from 'date-fns';
 
 interface TimeGridProps {
   goalId: string;
@@ -13,6 +14,8 @@ export const TimeGrid: React.FC<TimeGridProps> = React.memo(({ goalId, date }) =
   const availabilityForDate = goal?.availability.find(a => a.date === date);
   const selectedHours = availabilityForDate?.hours || [];
 
+  const isCurrentDate = isToday(parseISO(date));
+
   const handleHourToggle = (hour: number) => {
     const isSelected = selectedHours.includes(hour);
     dispatch({
@@ -22,7 +25,7 @@ export const TimeGrid: React.FC<TimeGridProps> = React.memo(({ goalId, date }) =
   };
 
   return (
-    <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg">
+    <div className={`p-4 border border-slate-200 dark:border-slate-700 rounded-l ${isCurrentDate?'bg-blue-100 dark:bg-blue-900':''}`} data-is-current-date={isCurrentDate?'true':undefined}>
        <h4 className="text-sm font-semibold mb-3 text-center text-slate-700 dark:text-slate-300">
            {formatReadableDate(date)} - Available Hours
        </h4>

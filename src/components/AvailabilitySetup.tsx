@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { getDatesInRange, formatReadableDate } from '../utils/dateHelpers';
@@ -7,6 +7,18 @@ import { FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
 
 export const AvailabilitySetup: React.FC = () => {
     const { activeGoal } = useAppContext(); // Use the derived activeGoal from context
+
+    useEffect(() => {
+        if (activeGoal) {
+            // Use requestAnimationFrame to allow DOM to update
+            requestAnimationFrame(() => {
+                const currentGrid = document.querySelector('[data-is-current-date="true"]');
+                if (currentGrid) {
+                    currentGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+    }, [activeGoal]);
 
     // Show message if no active goal
     if (!activeGoal) {
