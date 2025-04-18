@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import CalendarHeatmap from 'react-calendar-heatmap';
+import CalendarHeatmap, { ReactCalendarHeatmapValue } from 'react-calendar-heatmap';
 import { Tooltip as ReactTooltip } from 'react-tooltip'; // Using react-tooltip for tooltips
-import { startOfDay, endOfDay, parseISO, max, subMonths } from 'date-fns';
+import { startOfDay, endOfDay, subMonths } from 'date-fns';
 import { useAppContext } from '../contexts/AppContext';
 import { formatDate } from '../utils/dateHelpers';
 
 
-type HeatmapCallbackValue = { date: string; count: number } | null | undefined;
+// type HeatmapCallbackValue = { date: string; count: number } | null | undefined;
 type TooltipDataAttrs = { [key: string]: string | number | boolean | undefined };
 
 export const ActivityHeatmap: React.FC = () => {
@@ -22,6 +22,7 @@ export const ActivityHeatmap: React.FC = () => {
         const dailyCounts: Record<string, number> = {};
 
         goals.forEach(goal => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             Object.entries(goal.availability || {}).forEach(([_,data]) => {
                 const dateKey = formatDate(data.date); // Ensure consistent YYYY-MM-DD format
                 dailyCounts[dateKey] = 0;
@@ -47,7 +48,7 @@ export const ActivityHeatmap: React.FC = () => {
 
     // Function to determine the CSS class (color intensity) based on count
     // Adjust thresholds and classes as needed
-    const getClassForValue = (value: HeatmapCallbackValue ): string => {
+    const getClassForValue = (value: ReactCalendarHeatmapValue<string> | undefined ): string => {
         if (!value || value.count === 0) {
             return 'color-empty'; // Default empty color
         }
@@ -63,7 +64,7 @@ export const ActivityHeatmap: React.FC = () => {
         return 'color-scale-4'; // Darkest color
     };
 
-    const getTooltipDataAttrs = (value: HeatmapCallbackValue): TooltipDataAttrs => {
+    const getTooltipDataAttrs = (value: ReactCalendarHeatmapValue<string> | undefined): TooltipDataAttrs => {
         const baseAttrs = { 'data-tooltip-id': 'heatmap-tooltip' };
         if (!value || !value.date) {
             // Provide minimal content or rely on tooltip library to not show for empty data
