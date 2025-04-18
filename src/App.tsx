@@ -16,6 +16,7 @@ import { Goal } from './types/index.ts';
 import { FeedbackView } from './components/FeedbackView'; // Import the new view
 import { FaBars, FaChartBar } from 'react-icons/fa';
 import { Logo } from './components/common/Logo.tsx';
+import { ActivityHeatmap } from './components/ActivityHeatmap.tsx';
 // import { useIdleTimer } from 'react-idle-timer'; // Import idle timer if needed
 
 // Main application shell component
@@ -65,6 +66,8 @@ const AppShell: React.FC = () => {
     const DashboardView: React.FC<{ goals: Goal[] }> = ({ goals }) => (
         <div className="p-4 md:p-6 space-y-6">
              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Dashboard</h2>
+
+             <ActivityHeatmap />
 
              {/* Check if there are any goals */}
              {goals.length === 0 ? (

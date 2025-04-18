@@ -80,3 +80,29 @@
  .dark .react-datepicker__day--disabled {
      color: theme('colors.slate.500') !important;
  }
+
+ /* react-calendar-heatmap styles */
+/* Base styles from the library are imported in main.tsx */
+/* Custom color scale (adjust colors and thresholds as needed) */
+.react-calendar-heatmap .color-empty { fill: theme('colors.slate.100'); }
+.dark .react-calendar-heatmap .color-empty { fill: theme('colors.slate.700'); }
+.react-calendar-heatmap .color-scale-1 { fill: theme('colors.blue.200'); }
+.react-calendar-heatmap .color-scale-2 { fill: theme('colors.blue.400'); }
+.react-calendar-heatmap .color-scale-3 { fill: theme('colors.blue.600'); }
+.react-calendar-heatmap .color-scale-4 { fill: theme('colors.blue.800'); }
+/* Dark mode overrides for scale */
+.dark .react-calendar-heatmap .color-scale-1 { fill: theme('colors.blue.900'); }
+.dark .react-calendar-heatmap .color-scale-2 { fill: theme('colors.blue.700'); }
+.dark .react-calendar-heatmap .color-scale-3 { fill: theme('colors.blue.500'); }
+.dark .react-calendar-heatmap .color-scale-4 { fill: theme('colors.blue.300'); }
+/* Optional: Style month/weekday labels */
+.react-calendar-heatmap text { font-size: 9px; fill: theme('colors.slate.500'); }
+.dark .react-calendar-heatmap text { fill: theme('colors.slate.400'); }
+/* react-tooltip override for heatmap */
+/* Ensure high z-index and customize appearance */
+#__react_tooltip { /* Default ID used by react-tooltip v5 */
+    z-index: 9999 !important; /* High z-index */
+    pointer-events: none; /* Prevent tooltip from blocking interactions */
+    /* Add any other style overrides needed */
+    /* Example: background-color: rgba(0, 0, 0, 0.8) !important; */
+}
