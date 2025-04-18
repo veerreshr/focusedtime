@@ -80,7 +80,7 @@ export const ActivityHeatmap: React.FC = () => {
    };
 
     return (
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg shadow">
+        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg shadow lg:pr-10 lg:max-w-[1024px]">
             <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-200">Activity Overview (Last Year)</h3>
             <div className="overflow-x-auto w-auto"> {/* Allow horizontal scroll on small screens if needed */}
                 <div className="min-w-[750px]">
