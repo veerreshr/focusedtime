@@ -21,6 +21,27 @@ export const Timeline: React.FC = () => {
         return () => clearInterval(intervalId); // Cleanup interval on unmount
     }, []);
 
+        // Scroll to current hour on mount or when active goal changes
+        useEffect(() => {
+            if (activeGoal) {
+                // Use requestAnimationFrame to ensure DOM is ready after potential re-renders
+                requestAnimationFrame(() => {
+                    // Find the element marking the current hour
+                     const currentHourElement = document.querySelector('[data-is-current-hour="true"]');
+                     if (currentHourElement) {
+                        currentHourElement.scrollIntoView({
+                            behavior: 'smooth', 
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                     } else {
+                        // Optional: If no current hour found (e.g., goal doesn't include today), scroll to top or first day?
+                        // console.log("Current hour element not found for scrolling.");
+                     }
+                });
+            }
+        }, [activeGoal]); 
+
     if (!activeGoal) {
         return <div className="text-center text-slate-500 dark:text-slate-400 mt-10">Select or create a goal to view the timeline.</div>;
     }

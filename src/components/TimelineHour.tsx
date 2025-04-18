@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { formatTime, isHourPast, isHourCurrent, getCurrentHourProgress } from '../utils/dateHelpers';
-// import { motion } from 'framer-motion'; // Import framer-motion
+import { motion } from 'framer-motion';
 
 interface TimelineHourProps {
   goalId: string;
@@ -61,9 +61,8 @@ export const TimelineHour: React.FC<TimelineHourProps> = React.memo(({
     };
 
     const handlePlanClick = () => {
-        if (!isPast && !isCurrent) { // Allow editing plan only for future hours
-            setIsEditingPlan(true);
-        }
+        // if (!isPast && !isCurrent)
+        setIsEditingPlan(true);
     };
 
     // --- Handlers for Accomplishment ---
@@ -135,24 +134,28 @@ export const TimelineHour: React.FC<TimelineHourProps> = React.memo(({
         textColor = 'text-blue-800 dark:text-blue-200';
         timeColor = 'text-blue-500 dark:text-blue-400 font-semibold';
         hoverEffect = ''; // No hover needed for current hour maybe? Or subtle one.
-        glowEffect = 'shadow-lg shadow-blue-500/30 dark:shadow-blue-400/20 ring-2 ring-blue-500 dark:ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900'; // Glow effect
+        glowEffect = 'shadow-lg shadow-blue-100/30 dark:shadow-blue-400/20 ring-2 ring-blue-200 dark:ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900'; // Glow effect
     }
 
     const backgroundStyle = isCurrent && isAvailable
-        ? { background: `linear-gradient(to right, #3B82F6 ${currentProgress}%, white ${currentProgress}%)` } // Blue to white gradient
-        : {};
+        ? { background: `linear-gradient(to right,rgb(190 219 255) ${currentProgress}%, white ${currentProgress}%)` } // Blue to white gradient
+        : isCurrent 
+            ? { background: `linear-gradient(to right, rgb(190 219 255) ${currentProgress}%, rgb(248 250 252) ${currentProgress}%)` } 
+            : {};
 
     const darkBackgroundStyle = isCurrent && isAvailable
         ? { background: `linear-gradient(to right, #3B82F6 ${currentProgress}%, #1E293B ${currentProgress}%)` } // Blue to slate-900 gradient for dark mode
-        : {};
+        : isCurrent 
+            ? { background: `linear-gradient(to right, #3B82F6 ${currentProgress}%, #1E293B ${currentProgress}%)` } 
+            : {};
 
 
     return (
-        // Using motion.div for potential animations later
-        // <motion.div ... >
-        <div
-            className={`flex items-start space-x-3 p-3 border-b ${borderColor} ${bgColor} ${hoverEffect} transition-all duration-150 ease-in-out rounded-sm ${glowEffect}`}
-            style={document.documentElement.classList.contains('dark') ? darkBackgroundStyle : backgroundStyle} // Apply gradient style conditionally
+        <motion.div
+            className={`relative flex items-start space-x-3 p-3 border-b ${borderColor} ${bgColor} ${hoverEffect} transition-all duration-150 ease-in-out rounded-sm ${glowEffect}`}
+            style={
+                document.documentElement.classList.contains('dark') ? darkBackgroundStyle : backgroundStyle} // Apply gradient style conditionally
+            data-is-current-hour={isCurrent ? 'true' : undefined}
         >
             {/* Time Column */}
             <div className={`w-12 text-right font-mono text-xs pt-1 flex-shrink-0 ${timeColor}`}>
@@ -179,9 +182,9 @@ export const TimelineHour: React.FC<TimelineHourProps> = React.memo(({
                         ) : (
                             <div
                                 onClick={handlePlanClick}
-                                className={`text-sm min-h-[2em] p-1 rounded ${plan ? textColor : 'text-slate-400 dark:text-slate-500 italic'} ${!isPast && !isCurrent ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700' : 'cursor-default'}`}
+                                className={`text-sm min-h-[2em] p-1 rounded ${plan ? textColor : 'text-slate-400 dark:text-slate-500 italic'} cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700`}
                             >
-                                {plan || ( (!isPast && !isCurrent) ? 'Click to add plan...' : 'No plan set')}
+                                {plan || ( 'Click to add plan...' )}
                             </div>
                         )}
                     </div>
@@ -199,7 +202,7 @@ export const TimelineHour: React.FC<TimelineHourProps> = React.memo(({
                                 onBlur={handleAccomplishmentBlur}
                                 placeholder="What did you achieve?"
                                 rows={2}
-                                maxLength={200}
+                                maxLength={500}
                                 className="w-full p-1 text-sm border border-blue-300 dark:border-blue-700 rounded bg-white dark:bg-slate-700 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-100 resize-none"
                             />
                          ) : (
@@ -220,7 +223,7 @@ export const TimelineHour: React.FC<TimelineHourProps> = React.memo(({
                      </div>
                 )}
             </div>
-        </div>
+        </motion.div>
        // </motion.div>
     );
 });
