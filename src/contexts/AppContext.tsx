@@ -5,7 +5,7 @@
  */
 import React, { createContext, useReducer, useContext, useEffect, ReactNode, Dispatch } from 'react';
 import { AppState, AppAction, Goal, Availability } from '../types/index.ts';
-import { getDay, parseISO, isValid } from 'date-fns';
+import { getDay, parseISO, isValid, startOfDay, isBefore } from 'date-fns';
 import { getDatesInRange } from '../utils/dateHelpers';
 
 // --- Local Storage Keys ---
@@ -18,45 +18,51 @@ const initialState: AppState = {
   reminders: { enabled: false, minutesBefore: 15 },
 };
 
-// --- Helper Function to Apply Template ---
-const applyTemplateToGoal = (goal: Goal): Goal => {
-  if (!goal.templateAvailability || !goal.startDate || !goal.endDate) {
-      // If no template or invalid dates, return goal as is (or with empty availability)
-      return { ...goal, availability: goal.availability || [] };
+
+const generateAvailabilityFromTemplate = (newGoalData: Goal,oldAvailability: Availability[] = [] ): Availability[] => {
+  if (!newGoalData.templateAvailability || !newGoalData.startDate || !newGoalData.endDate) {
+      return oldAvailability;
   }
 
-  const dates = getDatesInRange(goal.startDate, goal.endDate);
-  const newAvailability: Availability[] = [];
+  const today = startOfDay(new Date());
+  const dates = getDatesInRange(newGoalData.startDate, newGoalData.endDate);
+  const generatedAvailability: Availability[] = [];
 
   dates.forEach(dateStr => {
       try {
-          const dateObj = parseISO(dateStr);
-          if (isValid(dateObj)) {
-              const dayOfWeek = getDay(dateObj); // 0 (Sun) to 6 (Sat)
-              const templateHours = goal.templateAvailability?.[dayOfWeek];
-
-              // Only add if template has hours defined for this day of the week
-              if (templateHours && templateHours.length > 0) {
-                  newAvailability.push({ date: dateStr, hours: [...templateHours].sort((a, b) => a - b) });
+          const currentDate = parseISO(dateStr);
+          if (isValid(currentDate)) {
+            if(isBefore(currentDate, today)){
+              // Preserve past availability from the old goal state
+              const existingEntry = oldAvailability.find(a => a.date === dateStr);
+              if (existingEntry) {
+                  generatedAvailability.push(existingEntry);
               }
+              // If no existing entry for a past date, it remains empty
+            }else{
+              // Apply NEW template to today and future dates
+              const dayOfWeek = getDay(currentDate); // 0 (Sun) to 6 (Sat)
+              const templateHours = newGoalData.templateAvailability?.[dayOfWeek];
+              if (templateHours && templateHours.length > 0) {
+                  generatedAvailability.push({ date: dateStr, hours: [...templateHours].sort((a, b) => a - b) });
+              }
+              // If template has no hours for this future day, it remains empty
+            }
           }
       } catch (e) {
           console.error(`Error processing date ${dateStr} for template application`, e);
       }
   });
 
-  // Important: Merge with existing specific availability?
-  // For now, let's assume template application *replaces* existing availability
-  // when ADD_GOAL or UPDATE_GOAL is called with a template.
-  // Manual overrides via UPDATE_AVAILABILITY will modify this generated list later.
-  return { ...goal, availability: newAvailability };
+    // Ensure the availability array is sorted by date
+    generatedAvailability.sort((a, b) => a.date.localeCompare(b.date));
+    return generatedAvailability;
 };
 
 // --- Reducer Logic ---
 const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
     case 'LOAD_STATE':
-      // Add basic validation before loading state
       if (action.payload && Array.isArray(action.payload.goals) && typeof action.payload.reminders === 'object') {
           // Ensure loaded goals have necessary fields (backward compatibility)
           const validatedGoals = action.payload.goals.map(g => ({
@@ -73,20 +79,25 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 
 
     case 'ADD_GOAL': {
-      // Apply template to generate initial availability before adding
-      const goalWithAppliedTemplate = applyTemplateToGoal(action.payload);
+      const generatedAvailability = generateAvailabilityFromTemplate(action.payload);
+      const finalNewGoal = { ...action.payload, availability: generatedAvailability };
       return {
           ...state,
-          goals: [...state.goals, goalWithAppliedTemplate]
+          goals: [...state.goals, finalNewGoal]
       };
     }
 
     case 'UPDATE_GOAL': {
-      // Apply template to generate availability when updating goal details (dates or template itself)
-      const goalWithAppliedTemplate = applyTemplateToGoal(action.payload);
+      const updatedGoalData = action.payload;
+      const oldGoal = state.goals.find(g => g.id === updatedGoalData.id);
+      if (!oldGoal) return state;
+
+      const generatedAvailability = generateAvailabilityFromTemplate(updatedGoalData, oldGoal.availability);
+      const finalUpdatedGoal = { ...updatedGoalData, availability: generatedAvailability };
+
       return {
         ...state,
-        goals: state.goals.map(g => g.id === action.payload.id ? goalWithAppliedTemplate : g),
+        goals: state.goals.map(g => g.id === updatedGoalData.id ? finalUpdatedGoal : g),
       };
     }
 
