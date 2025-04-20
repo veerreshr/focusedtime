@@ -1,7 +1,6 @@
 /*
  * src/components/DashboardMetrics.tsx
  * Displays key progress metrics for the active goal.
- * UPDATED with new stats and calculations.
  */
 import React, { useMemo } from 'react';
 // import { useAppContext } from '../contexts/AppContext';
@@ -52,18 +51,11 @@ const calculateMetrics = (goal: Goal | null) => {
         hoursLogged += Object.keys(goal.accomplishments[date] || {}).length;
     });
 
-    // 5. Progress (Logged / Total Available for Entire Goal)
-    const progress = totalAvailableHoursEntireGoal > 0
-        ? Math.min(100, (hoursLogged / totalAvailableHoursEntireGoal) * 100)
-        : (hoursLogged > 0 ? 100 : 0); // Show 100% if logged but no available hours planned
-
-
     return {
         totalPossibleHours,
         totalAvailableHoursEntireGoal,
         totalAvailableHoursFromNow,
-        hoursLogged,
-        progress: Math.max(0, progress), // Ensure progress isn't negative
+        hoursLogged
     };
 };
 
@@ -75,9 +67,25 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({ goal }) => {
         totalPossibleHours,
         totalAvailableHoursEntireGoal,
         totalAvailableHoursFromNow,
-        hoursLogged,
-        progress
+        hoursLogged
     } = useMemo(() => calculateMetrics(goal), [goal]); // Dependency is the goal prop
+
+    
+    // Calculate the third segment: Past Available but Not Logged
+    // Ensure it's not negative (e.g., if logged hours somehow exceed past available)
+    const pastAvailableNotLogged = Math.max(0, totalAvailableHoursEntireGoal - totalAvailableHoursFromNow - hoursLogged);
+
+     // Calculate percentages for the bar segments
+     const loggedPercent = totalAvailableHoursEntireGoal > 0
+     ? (hoursLogged / totalAvailableHoursEntireGoal) * 100
+     : 0;
+    const futurePercent = totalAvailableHoursEntireGoal > 0
+        ? (totalAvailableHoursFromNow / totalAvailableHoursEntireGoal) * 100
+        : 0;
+    // Calculate the last segment ensuring total doesn't exceed 100% due to rounding
+    const pastNotLoggedPercent = Math.max(0, 100 - loggedPercent - futurePercent);
+
+
 
     // Basic check if goal prop is valid
     if (!goal) {
@@ -114,22 +122,47 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({ goal }) => {
                          Hours Logged
                     </div>
                 </div>
-                {/* Progress Bar Section */}
+
+                {/* 3-Segment Progress Bar Section */}
                 <div className="pt-2">
-                    <div className="flex justify-between mb-1">
-                         <span className="font-medium text-slate-600 dark:text-slate-300">Progress</span>
-                         <span className="font-medium text-slate-700 dark:text-slate-200">{progress.toFixed(0)}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden"> {/* Smaller progress bar */}
-                        <div
-                            className="bg-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out"
-                            style={{ width: `${progress}%` }}
-                            role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}
-                            aria-label={`Progress ${progress.toFixed(0)}%`}
-                        ></div>
-                    </div>
-                     <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 text-right"> {/* Extra small text */}
-                         {hoursLogged} / {totalAvailableHoursEntireGoal} logged
+                     <div
+                         className="w-full flex rounded-full h-2 overflow-hidden" // Increased height slightly
+                         title={`Logged: ${hoursLogged}, Future Available: ${totalAvailableHoursFromNow}, Past Unlogged: ${pastAvailableNotLogged}`}
+                     >
+                         {/* Logged Segment (Past) */}
+                         <div
+                             className="bg-blue-600 h-full transition-all duration-500 ease-out"
+                             style={{ width: `${loggedPercent}%` }}
+                             role="progressbar"
+                             aria-valuenow={hoursLogged}
+                             aria-valuemin={0}
+                             aria-valuemax={totalAvailableHoursEntireGoal}
+                             aria-label={`${hoursLogged} hours logged`}
+                         ></div>
+                         {/* Past Available, Not Logged Segment */}
+                         <div
+                             className="bg-slate-300 dark:bg-slate-600 h-full transition-all duration-500 ease-out"
+                             style={{ width: `${pastNotLoggedPercent}%` }}
+                             aria-hidden="true"
+                         ></div>
+                         {/* Future Available Segment */}
+                         <div
+                             className="bg-green-400 h-full transition-all duration-500 ease-out"
+                             style={{ width: `${futurePercent}%` }}
+                             aria-hidden="true"
+                         ></div>
+                     </div>
+                     {/* Legend for the bar */}
+                      <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1 flex-wrap">
+                         <span className="flex items-center" title={`${hoursLogged} hours`}>
+                            <span className="inline-block w-2 h-2 rounded-full bg-blue-600 mr-1"></span>Logged({loggedPercent.toFixed(1)}%)
+                         </span>
+                         <span className="flex items-center" title={`${pastAvailableNotLogged} hours`}>
+                            <span className="inline-block w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 mr-1"></span>Past Unlogged({pastNotLoggedPercent.toFixed(1)}%)
+                         </span>
+                         <span className="flex items-center" title={`${totalAvailableHoursFromNow} hours`}>
+                            <span className="inline-block w-2 h-2 rounded-full bg-green-400 mr-1"></span>Future({futurePercent.toFixed(1)}%)
+                         </span>
                      </div>
                 </div>
             </div>
