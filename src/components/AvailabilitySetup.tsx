@@ -6,10 +6,9 @@ import { TimeGrid } from './TimeGrid';
 import { FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
 
 export const AvailabilitySetup: React.FC = () => {
-    const { activeGoal } = useAppContext(); // Use the derived activeGoal from context
-
+    const { activeGoal } = useAppContext();
     useEffect(() => {
-        if (activeGoal) {
+        if (activeGoal && activeGoal.id) {
             // Use requestAnimationFrame to allow DOM to update
             requestAnimationFrame(() => {
                 const currentGrid = document.querySelector('[data-is-current-date="true"]');
@@ -18,7 +17,7 @@ export const AvailabilitySetup: React.FC = () => {
                 }
             });
         }
-    }, [activeGoal]);
+    }, [activeGoal?.id]);
 
     // Show message if no active goal
     if (!activeGoal) {

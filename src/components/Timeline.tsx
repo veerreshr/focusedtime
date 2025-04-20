@@ -23,7 +23,7 @@ export const Timeline: React.FC = () => {
 
         // Scroll to current hour on mount or when active goal changes
         useEffect(() => {
-            if (activeGoal) {
+            if (activeGoal && activeGoal?.id) {
                 // Use requestAnimationFrame to ensure DOM is ready after potential re-renders
                 requestAnimationFrame(() => {
                     // Find the element marking the current hour
@@ -40,7 +40,7 @@ export const Timeline: React.FC = () => {
                      }
                 });
             }
-        }, [activeGoal]); 
+        }, [activeGoal?.id]); 
 
     if (!activeGoal) {
         return <div className="text-center text-slate-500 dark:text-slate-400 mt-10">Select or create a goal to view the timeline.</div>;
