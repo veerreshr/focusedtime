@@ -68,7 +68,7 @@ export const TimelineHour: React.FC<TimelineHourProps> = React.memo(({
     // --- Handlers for Accomplishment ---
     const handleAccomplishmentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
          const value = e.target.value;
-         if (value.length <= 200) {
+         if (value.length <= 500) {
              setAccomplishment(value);
              debounceSave('accomplishment', value);
          }
