@@ -2,6 +2,11 @@
 
 A simple, offline-first web application designed to help you plan, track, and report progress towards your goals with granular hourly scheduling.
 
+https://focusedtime.netlify.app
+
+![1000018591](https://github.com/user-attachments/assets/f93c46ed-9f7d-4656-b114-1c3df0d09088)
+
+
 ## Core Features
 
 * **Goal Configuration:** Define goals with titles, descriptions, start dates, and end dates.
